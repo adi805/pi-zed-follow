@@ -1,0 +1,15 @@
+{
+  "name": "pi-zed-follow",
+  "version": "1.0.0",
+  "description": "Pi extension that auto-opens files in Zed editor when Pi writes or edits them",
+  "license": "MIT",
+  "author": "adi805",
+  "keywords": ["pi-package", "pi-extension", "zed", "auto-follow"],
+  "files": ["extensions/", "README.md"],
+  "pi": {
+    "extensions": ["./extensions"]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  }
+}
