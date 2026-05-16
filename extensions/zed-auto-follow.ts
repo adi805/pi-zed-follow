@@ -13,6 +13,7 @@ export default function zedAutoFollow(pi: ExtensionAPI) {
 	const recentlyOpened = new Set<string>();
 	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 	const pendingOpens: string[] = [];
+	const argsCache = new Map<string, any>();
 
 	function openInZed(filePath: string) {
 		try {
@@ -34,11 +35,18 @@ export default function zedAutoFollow(pi: ExtensionAPI) {
 		setTimeout(() => recentlyOpened.delete(filePath), 5000);
 	}
 
+	// Cache args from tool_execution_start since tool_execution_end may not have them
+	pi.on("tool_execution_start", async (event) => {
+		argsCache.set(event.toolCallId, event.args || {});
+	});
+
 	pi.on("tool_execution_end", async (event, ctx) => {
 		if (event.toolName !== "write" && event.toolName !== "edit") return;
 		if (event.isError) return;
 
-		const args = (event as any).args || {};
+		const args = argsCache.get(event.toolCallId) || {};
+		argsCache.delete(event.toolCallId);
+
 		const filePath = typeof args.path === "string" ? args.path : null;
 		if (!filePath) return;
 
